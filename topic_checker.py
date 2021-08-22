@@ -1,7 +1,7 @@
 import subprocess
 import sys
 import time
-
+import os
 
 def get_partition_and_leader(topic_string):
     partitionIndex = topic_string.find("Partition:")
@@ -28,12 +28,17 @@ def launch_consumer(partition):
 def open_log_file(logfilepath):
     return open(logfilepath, mode='w')
 
+def get_kafka_home():
+    kafka_home = os.environ['KAFKA_HOME']
+    print(kafka_home)
+    return kafka_home
+
 if __name__ == '__main__':
 
-    if len(sys.argv) != 2:
+    kafka_home = get_kafka_home()
+    if not kafka_home:
         raise ValueError('Provide path to kafka install as argument')
-    kafka_path = sys.argv[1]
-    kafka_topic_command = kafka_path + "bin/kafka-topics.sh"
+    kafka_topic_command = kafka_home + "bin/kafka-topics.sh"
     print("Kafka topic command =" + kafka_topic_command)
     consumer_process_launched = False
     partition_found_here = False
@@ -68,5 +73,3 @@ if __name__ == '__main__':
             consumer_process_to_watch.kill()
             consumer_process_launched = False
         time.sleep(1) # wait 1 sec before checking again
-
-
