@@ -1,6 +1,12 @@
 import board
 import neopixel
+import sys
+
 from confluent_kafka import Consumer, KafkaError, TopicPartition
+
+
+if len(sys.argv)!=2:
+  raise ValueError('Provide Partition as argument')
 num_of_leds = 8
 red = (255,0,0)
 blue = (0,0,255)
@@ -25,8 +31,10 @@ settings = {
     'session.timeout.ms': 6000,
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
+partition = sys.argv[1]
+print("partition:" + partition)
 c = Consumer(settings)
-c.assign([TopicPartition('barry', 1)])
+c.assign([TopicPartition('barry',int(partition))])
 # c.subscribe(['barry'])
 try:
     while True:
