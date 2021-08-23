@@ -4,6 +4,7 @@ import sys
 
 from confluent_kafka import Consumer, KafkaError, TopicPartition
 
+topic_name = "colors"
 
 if len(sys.argv)!=2:
   raise ValueError('Provide Partition as argument')
@@ -24,9 +25,9 @@ clear_bar()
 current_index=0
 
 settings = {
-    'bootstrap.servers': '192.168.1.128:9092',
-    'group.id': 'broker2',
-    'client.id': 'pi-broker2',
+    'bootstrap.servers': '192.168.1.128:9092,192.168.1.120:9092,192.168.1.122:9092',
+    'group.id': 'broker0',
+    'client.id': 'pi-broker0',
     'enable.auto.commit': True,
     'session.timeout.ms': 6000,
     'default.topic.config': {'auto.offset.reset': 'smallest'}
@@ -34,7 +35,7 @@ settings = {
 partition = sys.argv[1]
 print("partition:" + partition)
 c = Consumer(settings)
-c.assign([TopicPartition('barry',int(partition))])
+c.assign([TopicPartition(topic_name, int(partition))])
 # c.subscribe(['barry'])
 try:
     while True:
@@ -42,15 +43,15 @@ try:
         if msg is None:
             continue
         elif not msg.error():
-            msgvalue= msg.value().decode('utf-8')
+            msgvalue = msg.value().decode('utf-8')
             print('Received message: {0}'.format(msgvalue))
             print("Hello from here")
-            if(current_index>=num_of_leds):
+            if (current_index >= num_of_leds):
                 clear_bar()
-                current_index=0
-            if(msgvalue=='red'):
+                current_index = 0
+            if (msgvalue == 'red'):
                 pixels[current_index] = red
-            if(msgvalue=='blue'):
+            if (msgvalue == 'blue'):
                 pixels[current_index] = blue
             if (msgvalue == 'green'):
                 pixels[current_index] = green
