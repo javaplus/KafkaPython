@@ -27,12 +27,14 @@ journalctl -u topic_checker -b
 3. Messages split across 3 partitions.
   - 3 Brokers running, 3 Partition, 1 Producer, 1 consumer.
   - Producer sends messages they should split to 3 different Brokers.  Messages split across each broker/partition. All messages go to single consumer
-4. 3 Brokers running, 3 Partition, 1 Producer, 1 consumer.
+4. Broker down then rebalance
+  - 3 Brokers running, 3 Partition, 1 Producer, 1 consumer.
   - kill one broker and wait for things to rebalance
   - Then messages flow to other brokers where partition was rebalanced.
   - Consumer and producer notices nothing other than a pause while rebalances happens
-5.  3 Brokers running, 1 or N Partitions, 1 Producer, 1 consumer. (May easier to see with 1 partition)
+5.  Consumer down while messages come in
+  - 3 Brokers running, 1 or N Partitions, 1 Producer, 1 consumer. (May easier to see with 1 partition)
   - Verify Consumer is receiving messages and then shutdown the consumer
   - Send a few messages and restart the consumer.
   - Consumer should display messages while it was down.
-6. 
+6. Two consumers share the load of messages.
