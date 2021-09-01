@@ -1,8 +1,13 @@
 import board
 import neopixel
 import sys
-
 from confluent_kafka import Consumer, KafkaError, TopicPartition
+import logging
+
+logging.basicConfig(filename='/home/pi/logs/consumer.log', level=logging.DEBUG, filemode='w', format='%(asctime)s %(message)s')
+
+def logMessage(message):
+    logging.info(message)
 
 topic_name = "colors"
 
@@ -14,18 +19,19 @@ blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
 
+pixels = neopixel.NeoPixel(board.D18, num_of_leds)
+
 def clear_bar():
     for x in range(num_of_leds):
         pixels[x] = (0, 0, 0)
 
-pixels = neopixel.NeoPixel(board.D18, num_of_leds)
 clear_bar()
 
 
 current_index=0
 
 settings = {
-    'bootstrap.servers': '192.168.1.128:9092,192.168.1.120:9092,192.168.1.122:9092',
+    'bootstrap.servers': '192.168.8.10:9092,192.168.8.20:9092,192.168.8.30:9092',
     'group.id': 'broker0',
     'client.id': 'pi-broker0',
     'enable.auto.commit': True,
@@ -33,7 +39,7 @@ settings = {
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
 partition = sys.argv[1]
-print("partition:" + partition)
+logMessage("partition:" + partition)
 c = Consumer(settings)
 c.assign([TopicPartition(topic_name, int(partition))])
 # c.subscribe(['barry'])
@@ -44,8 +50,8 @@ try:
             continue
         elif not msg.error():
             msgvalue = msg.value().decode('utf-8')
-            print('Received message: {0}'.format(msgvalue))
-            print("Hello from here")
+            logMessage('Received message: {0}'.format(msgvalue))
+            logMessage("Hello from here")
             if (current_index >= num_of_leds):
                 clear_bar()
                 current_index = 0
@@ -58,12 +64,12 @@ try:
             if (msgvalue == 'yellow'):
                 pixels[current_index] = yellow
             current_index = current_index + 1
-            print("Doned!!!!!")
+            logMessage("Doned!!!!!")
         elif msg.error().code() == KafkaError._PARTITION_EOF:
-            print('End of partition reached {0}/{1}'
+            logMessage('End of partition reached {0}/{1}'
                   .format(msg.topic(), msg.partition()))
         else:
-            print('Error occured: {0}'.format(msg.error().str()))
+            logMessage('Error occured: {0}'.format(msg.error().str()))
 
 except KeyboardInterrupt:
     pass
