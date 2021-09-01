@@ -16,6 +16,31 @@ Good commands for managing Kafka:
 journalctl -u topic_checker -b
 
 
+# Systemd stuff to setup Kafka:
+
+https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
+
+systemctl enable systemd-networkd-wait-online.service
+
+systemctl enable systemd-networkd.service
+
+```
+[Unit]
+Requires=zookeeper.service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=kafka
+ExecStart=/bin/sh -c '/opt/kafka/kafka_2.13-2.8.0/bin/kafka-server-start.sh /opt/kafka/kafka_2.13-2.8.0/config/server.properties > /opt/kafka/kafka_2.13-2.8.0/kafka.log 2>&1'
+ExecStop=/opt/kafka/kafka_2.13-2.8.0/bin/kafka-server-stop.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
 # Scenarios:
 
 1. Base line test simple 
