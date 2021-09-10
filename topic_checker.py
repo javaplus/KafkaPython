@@ -4,11 +4,14 @@ import time
 import os
 import logging
 
-logging.basicConfig(filename='/home/pi/logs/topic_checker.log', level=logging.DEBUG, filemode='w', format='%(asctime)s %(message)s')
+logging.basicConfig(filename='/home/pi/logs/topic_checker.log', level=logging.DEBUG, filemode='w',
+                    format='%(asctime)s %(message)s')
 topic_name = "colors"
+
 
 def logMessage(message):
     logging.info(message)
+
 
 def get_partition_and_leader(topic_string):
     partitionIndex = topic_string.find("Partition:")
@@ -29,16 +32,20 @@ def get_partition_and_leader(topic_string):
 
 def launch_consumer(partition):
     logMessage("launching consumer for partition:" + partition)
-    consumer_process = subprocess.Popen(["python3", "/home/pi/consumer.py", partition],stdout=log_file, stderr=subprocess.STDOUT)
+    consumer_process = subprocess.Popen(["python3", "/home/pi/consumer.py", partition], stdout=log_file,
+                                        stderr=subprocess.STDOUT)
     return consumer_process
+
 
 def open_log_file(logfilepath):
     return open(logfilepath, mode='w')
+
 
 def get_kafka_home():
     kafka_home = os.environ['KAFKA_HOME']
     logMessage(kafka_home)
     return kafka_home
+
 
 if __name__ == '__main__':
 
@@ -52,11 +59,13 @@ if __name__ == '__main__':
     consumer_process_launched = False
     partition_found_here = False
     log_file = open_log_file("/home/pi/consumer.log")
-    
+    currently_watched_partition = -999
+
     while True:
         # start checking if kafka topic partition is on this leader.
-        process = subprocess.run([kafka_topic_command, "--bootstrap-server", "192.168.8.10:9092,192.168.8.20:9092,192.168.8.30:9092",
-                                  "--topic", topic_name, "--describe"], capture_output=True, text=True)
+        process = subprocess.run(
+            [kafka_topic_command, "--bootstrap-server", "192.168.8.10:9092,192.168.8.20:9092,192.168.8.30:9092",
+             "--topic", topic_name, "--describe"], capture_output=True, text=True)
 
         logMessage("return code" + str(process.returncode))
         logMessage("stdout=")
@@ -76,10 +85,19 @@ if __name__ == '__main__':
                 partition_found_here = False
         if partition_found_here:
             if not consumer_process_launched:
+                logMessage("launching consumer to watch partition" + str(partition))
                 consumer_process_to_watch = launch_consumer(partition)
+                currently_watched_partition = partition
                 consumer_process_launched = True
+            elif currently_watched_partition != partition:
+                # Shutdown process because partition changed
+                logMessage("Killing current consumer because partition changed")
+                consumer_process_to_watch.terminate()
+                consumer_process_to_watch.kill()
+                consumer_process_launched = False
         elif consumer_process_launched:
             consumer_process_to_watch.terminate()
             consumer_process_to_watch.kill()
             consumer_process_launched = False
-        time.sleep(1) # wait 1 sec before checking again
+        time.sleep(1)  # wait 1 sec before checking again
+
