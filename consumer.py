@@ -2,6 +2,12 @@ import board
 import neopixel
 from confluent_kafka import Consumer, KafkaError
 import logging
+import time
+import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
+GPIO.setwarnings(False) # Ignore warning for now
+#GPIO.setmode(GPIO.BOARD) # Use physical pin numbering
+# Set pin 10 to be an input pin and set initial value to be pulled low (off)
+GPIO.setup(21, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 logging.basicConfig(filename='/home/pi/logs/consumer.log', level=logging.DEBUG, filemode='w', format='%(asctime)s %(message)s')
 mylogger = logging.getLogger()
@@ -33,39 +39,57 @@ settings = {
     'metadata.max.age.ms': 20000,
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
-c = Consumer(settings,logger=mylogger)
-c.subscribe(['colors'])
+button_on = True
+
+
+def checkButton():
+    if GPIO.input(21) == GPIO.HIGH:
+        return True
+    else:
+        return False
+
+
 try:
     while True:
-        msg = c.poll(0.1)
-        if msg is None:
-            continue
-        elif not msg.error():
-            msgvalue= msg.value().decode('utf-8')
-            logMessage('Received message: {0}'.format(msgvalue))
-            logMessage("Hello from here")
-            if(current_index>=num_of_leds):
-                clear_bar()
-                current_index=0
-            if(msgvalue=='red'):
-                pixels[current_index] = red
-            if(msgvalue=='blue'):
-                pixels[current_index] = blue
-            if (msgvalue == 'green'):
-                pixels[current_index] = green
-            if (msgvalue == 'yellow'):
-                pixels[current_index] = yellow
-            current_index = current_index + 1
-            logMessage("Doned!!!!!")
-        elif msg.error().code() == KafkaError._PARTITION_EOF:
-            logMessage('End of partition reached {0}/{1}'
-                  .format(msg.topic(), msg.partition()))
-        else:
-            logMessage('Error occured: {0}'.format(msg.error().str()))
+        button_on = checkButton()
+        if button_on:
+            c = Consumer(settings, logger=mylogger)
+            c.subscribe(['colors'])
+            logMessage("Subscribing to Topic")
 
+            while button_on:
+                button_on = checkButton()
+                msg = c.poll(0.1)
+                if msg is None:
+                    continue
+                elif not msg.error():
+                    msgvalue = msg.value().decode('utf-8')
+                    logMessage('Received message: {0}'.format(msgvalue))
+                    logMessage("Hello from here")
+                    if (current_index >= num_of_leds):
+                        clear_bar()
+                        current_index = 0
+                    if (msgvalue == 'red'):
+                        pixels[current_index] = red
+                    if (msgvalue == 'blue'):
+                        pixels[current_index] = blue
+                    if (msgvalue == 'green'):
+                        pixels[current_index] = green
+                    if (msgvalue == 'yellow'):
+                        pixels[current_index] = yellow
+                    current_index = current_index + 1
+                    logMessage("Doned!!!!!")
+                elif msg.error().code() == KafkaError._PARTITION_EOF:
+                    logMessage('End of partition reached {0}/{1}'
+                               .format(msg.topic(), msg.partition()))
+                else:
+                    logMessage('Error occured: {0}'.format(msg.error().str()))
+
+            logMessage("Closing consumer")
+            c.close()
+        time.sleep(.15)
 except KeyboardInterrupt:
     pass
 
 finally:
     c.close()
-
