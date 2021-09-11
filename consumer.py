@@ -87,6 +87,7 @@ try:
 
             logMessage("Closing consumer")
             clear_bar()
+            current_index=0
             c.close()
         time.sleep(.15)
 except KeyboardInterrupt:
