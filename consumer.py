@@ -20,15 +20,17 @@ blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
 
+current_index=0
+
 def clear_bar():
     for x in range(num_of_leds):
         pixels[x] = (0, 0, 0)
+    current_index=0
 
 pixels = neopixel.NeoPixel(board.D18, num_of_leds)
 clear_bar()
 
 
-current_index=0
 
 settings = {
     'bootstrap.servers': '192.168.8.10:9092,192.168.8.20:9092,192.168.8.30:9092',
@@ -47,8 +49,6 @@ def checkButton():
         return True
     else:
         return False
-
-
 try:
     while True:
         button_on = checkButton()
@@ -63,15 +63,15 @@ try:
                 if msg is None:
                     continue
                 elif not msg.error():
-                    msgvalue = msg.value().decode('utf-8')
+                    msgvalue= msg.value().decode('utf-8')
                     logMessage('Received message: {0}'.format(msgvalue))
                     logMessage("Hello from here")
-                    if (current_index >= num_of_leds):
+                    if(current_index>=num_of_leds):
                         clear_bar()
-                        current_index = 0
-                    if (msgvalue == 'red'):
+                        current_index=0
+                    if(msgvalue=='red'):
                         pixels[current_index] = red
-                    if (msgvalue == 'blue'):
+                    if(msgvalue=='blue'):
                         pixels[current_index] = blue
                     if (msgvalue == 'green'):
                         pixels[current_index] = green
@@ -81,11 +81,12 @@ try:
                     logMessage("Doned!!!!!")
                 elif msg.error().code() == KafkaError._PARTITION_EOF:
                     logMessage('End of partition reached {0}/{1}'
-                               .format(msg.topic(), msg.partition()))
+                          .format(msg.topic(), msg.partition()))
                 else:
                     logMessage('Error occured: {0}'.format(msg.error().str()))
 
             logMessage("Closing consumer")
+            clear_bar()
             c.close()
         time.sleep(.15)
 except KeyboardInterrupt:
@@ -93,3 +94,6 @@ except KeyboardInterrupt:
 
 finally:
     c.close()
+
+
+
