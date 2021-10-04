@@ -14,7 +14,8 @@ mylogger = logging.getLogger()
 def logMessage(message):
     logging.info(message)
 
-num_of_leds = 8
+num_of_leds = 10
+num_of_plaque_leds = 23
 red = (255,0,0)
 blue = (0,0,255)
 green = (0,255,0)
@@ -27,7 +28,7 @@ def clear_bar():
         pixels[x] = (0, 0, 0)
     current_index=0
 
-pixels = neopixel.NeoPixel(board.D18, num_of_leds)
+pixels = neopixel.NeoPixel(board.D18, num_of_leds + num_of_plaque_leds)
 clear_bar()
 
 
@@ -49,6 +50,16 @@ def checkButton():
         return True
     else:
         return False
+
+def lightNamePlaque():
+    totalLeds = num_of_leds + num_of_plaque_leds
+    for pixel in range(num_of_leds, totalLeds):
+        pixels[pixel] = (255,255,255)
+
+def turnOffNamePlaque():
+    totalLeds = num_of_leds + num_of_plaque_leds
+    for pixel in range(num_of_leds,totalLeds):
+        pixels[pixel] = (0,0,0)
 try:
     while True:
         button_on = checkButton()
@@ -56,6 +67,7 @@ try:
             c = Consumer(settings, logger=mylogger)
             c.subscribe(['colors'])
             logMessage("Subscribing to Topic")
+            lightNamePlaque()
 
             while button_on:
                 button_on = checkButton()
@@ -87,6 +99,7 @@ try:
 
             logMessage("Closing consumer")
             clear_bar()
+            turnOffNamePlaque()
             current_index=0
             c.close()
         time.sleep(.15)
@@ -95,6 +108,3 @@ except KeyboardInterrupt:
 
 finally:
     c.close()
-
-
-
