@@ -41,6 +41,20 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
+#### Service locations
+Services are located either: /etc/systemd/system  or /lib/systemd/system
+
+#### Custom Services
+##### On Brokers:
+- zookeeper service (broker 0 only)
+- kafka service
+- topic_checker service : for seeing which broker partition is on and starting and stopping consumer
+
+##### On Consumers:
+
+- kafka-consumer service: for getting messages and controlling lights.
+-
+
 # Scenarios:
 
 1. Base line test simple 
