@@ -1,3 +1,5 @@
+import board
+import neopixel
 import subprocess
 import sys
 import time
@@ -36,6 +38,13 @@ def launch_consumer(partition):
                                         stderr=subprocess.STDOUT)
     return consumer_process
 
+num_of_leds = 8
+pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.1)
+
+def clear_bar():
+    for x in range(num_of_leds):
+        pixels[x] = (0, 0, 0)
+
 
 def open_log_file(logfilepath):
     return open(logfilepath, mode='w')
@@ -49,7 +58,7 @@ def get_kafka_home():
 
 if __name__ == '__main__':
 
-    my_leader = "0"
+    my_leader = "1"
 
     kafka_home = get_kafka_home()
     if not kafka_home:
@@ -92,12 +101,13 @@ if __name__ == '__main__':
             elif currently_watched_partition != partition:
                 # Shutdown process because partition changed
                 logMessage("Killing current consumer because partition changed")
+                clear_bar()
                 consumer_process_to_watch.terminate()
                 consumer_process_to_watch.kill()
                 consumer_process_launched = False
         elif consumer_process_launched:
+            clear_bar()
             consumer_process_to_watch.terminate()
             consumer_process_to_watch.kill()
             consumer_process_launched = False
         time.sleep(1)  # wait 1 sec before checking again
-
