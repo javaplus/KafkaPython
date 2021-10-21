@@ -21,7 +21,7 @@ blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
 
-pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.2)
+pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.1)
 
 def clear_bar():
     for x in range(num_of_leds):
