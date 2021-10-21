@@ -5,7 +5,6 @@ from confluent_kafka import Consumer, KafkaError, TopicPartition
 import logging
 import signal,sys
 
-
 logging.basicConfig(filename='/home/pi/logs/consumer.log', level=logging.DEBUG, filemode='w', format='%(asctime)s %(message)s')
 
 def logMessage(message):
@@ -21,17 +20,15 @@ blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
 
-pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.2)
+pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.1)
 
 def clear_bar():
     for x in range(num_of_leds):
         pixels[x] = (0, 0, 0)
+
 def indicate_partition(partition_number):
-    logMessage("in indicate_partition:"+str(partition_number))
-    myrange=range(int(partition_number)+1)
-    for index in myrange:
+    for index in range(int(partition_number)+1):
         pixels[index] = green
-        logMessage("making indexGreen:" + str(index))
 
 def termination_handler(signum, frame):
   logMessage("I'm shutting down vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvVVVVVVVVVVVVVVVVV")
@@ -54,7 +51,7 @@ settings = {
     'session.timeout.ms': 6000,
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
-
+partition = sys.argv[1]
 logMessage("partition:" + partition)
 c = Consumer(settings)
 c.assign([TopicPartition(topic_name, int(partition))])
