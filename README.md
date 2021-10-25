@@ -55,6 +55,12 @@ Services are located either: /etc/systemd/system  or /lib/systemd/system
 - kafka-consumer service: for getting messages and controlling lights.
 -
 
+### Network Configuration:
+
+ - ip routing to allow brokers to call out through WAN:
+ - sudo ip route del default via 192.168.8.1
+ - This disables the routing traffic through the internal networks gateway and will cause it to route external calls through the WAN gateway
+
 # Scenarios:
 
 1. Base line test simple 
