@@ -35,15 +35,10 @@ settings = {
 }
 
 def map_color(color_string):
-    ledColor = green
-    if color_string == "red":
-      ledColor = red
-    elif color_string == "blue":
-      ledColor = blue
-    elif color_string == "yellow":
-      ledColor = yellow;
+    ledColor = tuple(map(int,color_string.split(",")))
 
     return ledColor
+
 
 def clear_bar():
     for x in range(num_of_leds):
