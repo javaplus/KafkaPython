@@ -16,6 +16,13 @@ Good commands for managing Kafka:
 journalctl -u topic_checker -b
 
 
+##### Reset Streams application
+
+```
+/opt/kafka/kafka_2.13-2.8.0/bin/kafka-streams-application-reset.sh --zookeeper 192.168.8.10:2181 --bootstrap-servers 192.168.8.10:9092 --application-id count_buttons_processor
+
+```
+
 # Systemd stuff to setup Kafka:
 
 https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
