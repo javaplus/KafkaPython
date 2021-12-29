@@ -29,7 +29,7 @@ topic = 'colors'
 producer = Producer(conf,logger=mylogger)
 
 def produceMessage(message):
-    if message == "red":
+    if message == "255,0,0":
       producer.produce(topic, key="mymessageisred", value=message)
     else:
       producer.produce(topic, key=message, value=message)
@@ -40,14 +40,15 @@ if __name__ == '__main__':
     logMessage('Starting main')
     while True:
       if GPIO.input(10) == GPIO.HIGH:
-        produceMessage("red")
+        produceMessage("255,0,0")
         logMessage('Sending Red')
         time.sleep(delay)
       if GPIO.input(8) == GPIO.HIGH:
-        produceMessage("blue")
+        produceMessage("0,0,255")
         logMessage('Sending blue')
         time.sleep(delay)
       if GPIO.input(16) == GPIO.HIGH:
-        produceMessage("yellow")
+        produceMessage("255,255,0")
         logMessage('Sending yeloo')
         time.sleep(delay)
+
