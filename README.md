@@ -85,3 +85,29 @@ Services are located either: /etc/systemd/system  or /lib/systemd/system
   - Send a few messages and restart the consumer.
   - Consumer should display messages while it was down.
 6. Two consumers share the load of messages.
+
+
+#### Kafka Cat (KCat)
+
+###### Stream from remote topic to local topic
+
+```
+kafkacat -b pkc-ymrq7.us-east-2.aws.confluent.cloud:9092 \
+-X security.protocol=sasl_ssl -X sasl.mechanisms=PLAIN \
+-X sasl.username=<ke>  -X sasl.password=<secret>  \
+-X auto.offset.reset=end -o end -G copier_group \
+-C -t barry -K: -u | kafkacat -b 192.168.8.20:9092,192.168.8.10:9092,192.168.8.30:9092 \
+-v -P -t colors -K:
+```
+
+###### Get Details:
+
+```
+kafkacat -b pkc-ymrq7.us-east-2.aws.confluent.cloud:9092 \
+-X security.protocol=sasl_ssl -X sasl.mechanisms=PLAIN \
+-X sasl.username=<key>  -X sasl.password=<secret>  \
+-L
+```
+
+
+
