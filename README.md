@@ -64,10 +64,20 @@ Services are located either: /etc/systemd/system  or /lib/systemd/system
 
 ### Network Configuration:
 
+###### get routing table
+```
+sudo ip route
+```
  - ip routing to allow brokers to call out through WAN:
- - sudo ip route del default via 192.168.8.1
+```
+sudo ip route del default via 192.168.8.1
+```
+
  - This disables the routing traffic through the internal networks gateway and will cause it to route external calls through the WAN gateway
- - or sudo ip route del default dev eth0
+ - or 
+ ```
+ sudo ip route del default dev eth0
+ ```
 
 
 # Scenarios:
