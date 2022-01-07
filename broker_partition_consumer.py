@@ -15,13 +15,13 @@ topic_name = "colors"
 
 if len(sys.argv)!=2:
   raise ValueError('Provide Partition as argument')
-num_of_leds = 8
+num_of_leds = 10
 red = (255,0,0)
 blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
 
-pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.1)
+pixels = neopixel.NeoPixel(board.D18, num_of_leds,brightness=0.02)
 
 def clear_bar():
     for x in range(num_of_leds):
@@ -37,6 +37,19 @@ def termination_handler(signum, frame):
   logMessage("I'm shutting down vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvVVVVVVVVVVVVVVVVV")
   clear_bar()
   sys.exit(0)
+
+def processMessage(message):
+  try:
+    tupleMessage =  tuple(map(int,msgvalue.split(",")))
+
+    for i in range(3):
+      if(tupleMessage[i] < 0 or tupleMessage[i] > 255):
+        logMessage("Message being rejected to high or low")
+        return None
+    return tupleMessage
+  except Exception as e:
+    logMessage("Exception processing Message:" + str(e))
+    return None
 
 signal.signal(signal.SIGTERM, termination_handler)
 partition = sys.argv[1]
@@ -71,14 +84,17 @@ try:
             if (current_index >= num_of_leds):
                 clear_bar()
                 current_index = 0
-            if (msgvalue == 'red'):
-                pixels[current_index] = red
-            if (msgvalue == 'blue'):
-                pixels[current_index] = blue
-            if (msgvalue == 'green'):
-                pixels[current_index] = green
-            if (msgvalue == 'yellow'):
-                pixels[current_index] = yellow
+            #if (msgvalue == 'red'):
+            #    pixels[current_index] = red
+            #if (msgvalue == 'blue'):
+            #    pixels[current_index] = blue
+            #if (msgvalue == 'green'):
+            #    pixels[current_index] = green
+            #if (msgvalue == 'yellow'):
+            processedMessage = processMessage(msgvalue)
+            if processedMessage is None:
+               continue
+            pixels[current_index] = processedMessage
             current_index = current_index + 1
             logMessage("Doned!!!!!")
         elif msg.error().code() == KafkaError._PARTITION_EOF:
@@ -92,3 +108,4 @@ except KeyboardInterrupt:
 
 finally:
     c.close()
+
