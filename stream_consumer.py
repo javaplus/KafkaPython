@@ -1,7 +1,7 @@
 import json
 import board
 import neopixel
-from confluent_kafka import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError, TopicPartition, OFFSET_END
 import logging
 import time
 import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
@@ -35,10 +35,17 @@ settings = {
 }
 
 def map_color(color_string):
-    ledColor = tuple(map(int,color_string.split(",")))
+  try:
+    tupleMessage =  tuple(map(int,color_string.split(",")))
 
-    return ledColor
-
+    for i in range(3):
+      if(tupleMessage[i] < 0 or tupleMessage[i] > 255):
+        logMessage("Message being rejected to high or low")
+        return None
+    return tupleMessage
+  except Exception as e:
+    logMessage("Exception processing Message:" + str(e))
+    return None
 
 def clear_bar():
     for x in range(num_of_leds):
@@ -46,6 +53,8 @@ def clear_bar():
 
 def redraw_letters(color, count):
     ledColor = map_color(color)
+    if ledColor is None:
+      return
     current_led_index = 0
     for index in range(count):
       ledcount=letter_led_collection[index]
@@ -53,8 +62,8 @@ def redraw_letters(color, count):
         pixels[current_led_index] = ledColor
         current_led_index+=1
         time.sleep(.05)
-        
- def flash_letters(color, count):
+
+def flash_letters(color, count):
     clear_bar()
 
     if count >  5:
@@ -74,16 +83,6 @@ def redraw_letters(color, count):
 pixels = neopixel.NeoPixel(board.D18, num_of_leds)
 clear_bar()
 
-
-settings = {
-    'bootstrap.servers': '192.168.8.10:9092,192.168.8.20:9092,192.168.8.30:9092',
-    'group.id': 'pie',
-    'client.id': 'pie-1',
-    'enable.auto.commit': True,
-    'session.timeout.ms': 6000,
-    'metadata.max.age.ms': 20000,
-    'default.topic.config': {'auto.offset.reset': 'smallest'}
-}
 
 def checkButton():
     if GPIO.input(21) == GPIO.HIGH:
@@ -129,7 +128,9 @@ def processButtonCountMessage(btnCntMsg):
 
 try:
     c = Consumer(settings, logger=mylogger)
-    c.subscribe(['button_count'])
+    c.assign([TopicPartition('button_count', 0, OFFSET_END)])
+    #c.seek(0,2)
+    #c.subscribe(['button_count'])
     logMessage("Subscribing to Topic")
     rainbow_cycle(.0005)
 
@@ -157,4 +158,5 @@ except KeyboardInterrupt:
 
 finally:
     c.close()
+
 
