@@ -1,7 +1,7 @@
 import json
 import board
 import neopixel
-from confluent_kafka import Consumer, KafkaError
+from confluent_kafka import Consumer, KafkaError, TopicPartition, OFFSET_END
 import logging
 import time
 import RPi.GPIO as GPIO # Import Raspberry Pi GPIO library
@@ -25,9 +25,18 @@ def logMessage(message):
     logging.info(message)
 
 def map_color(color_string):
-    ledColor = tuple(map(int,color_string.split(",")))
+  try:
+    tupleMessage =  tuple(map(int, color_string.split(",")))
 
-    return ledColor
+    for i in range(3):
+      if(tupleMessage[i] < 0 or tupleMessage[i] > 255):
+        logMessage("Message being rejected to high or low")
+        return None
+    return tupleMessage
+  except Exception as e:
+    logMessage("Exception processing Message:" + str(e))
+    return None
+
 
 def clear_bar():
     for x in range(num_of_leds):
@@ -46,6 +55,8 @@ def redraw_letters(color, count):
 # Add one pix for color regardless of count
 def add_colors(color):
     ledColor = map_color(color)
+    if ledColor is None:
+      return
     global current_index
     global num_of_leds
     if current_index == num_of_leds:
@@ -78,7 +89,6 @@ def checkButton():
     else:
         return False
 
-
 def processButtonCountMessage(btnCntMsg):
     button_color = btnCntMsg["button"]
     button_count = btnCntMsg["count"]
@@ -88,7 +98,8 @@ def processButtonCountMessage(btnCntMsg):
 
 try:
     c = Consumer(settings, logger=mylogger)
-    c.subscribe(['button_count'])
+    c.assign([TopicPartition('button_count', 0, OFFSET_END)])
+    # c.subscribe(['button_count'])
     logMessage("Subscribing to Topic")
 
     while True:
