@@ -80,6 +80,34 @@ sudo ip route del default via 192.168.8.1
  ```
 
 
+## LIBRD Kafka
+
+THis library is used for confluent python libarary to actually interact with kafka.
+It seems that the version of this you can just "apt install" does not work on the Raspberry Pis.
+So, you have to build it yourself on the raspbery pi from the source.
+
+Had to clone the repo on the Pi's and build it and install it following the instructions from this repo.
+https://github.com/edenhill/librdkafka
+
+It can take quite some time to build and install on the PI's especially the Pi Zeros!
+
+Had an issue where I was getting this error on a consumer:
+```
+pi@KafkaBroker1:~ $ sudo python3 consumer.py 1
+Traceback (most recent call last):
+  File "consumer.py", line 4, in <module>
+    from confluent_kafka import Consumer, KafkaError, TopicPartition
+  File "/usr/local/lib/python3.7/dist-packages/confluent_kafka/__init__.py", line 19, in <module>
+    from .deserializing_consumer import DeserializingConsumer
+  File "/usr/local/lib/python3.7/dist-packages/confluent_kafka/deserializing_consumer.py", line 19, in <module>
+    from confluent_kafka.cimpl import Consumer as _ConsumerImpl
+ImportError: /usr/local/lib/python3.7/dist-packages/confluent_kafka/cimpl.cpython-37m-arm-linux-gnueabihf.so: undefined symbol: rd_kafka_consumer_group_metadata_write
+```
+Somehow APT had a version of librdkafka also installed and so I had to remove it using this command:
+```sudo apt purge librdkafka1```
+
+
+
 # Scenarios:
 
 1. Base line test simple 
