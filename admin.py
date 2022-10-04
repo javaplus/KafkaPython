@@ -37,7 +37,7 @@ def checkButton(button):
 
 def create_second_partition(a):
     """ create partitions """
-    new_parts = [NewPartitions(topic_name, 2, [[1, 2]])]
+    new_parts = [NewPartitions(topic_name, 2, [[2][1]])]
     fs = a.create_partitions(new_parts, validate_only=False)
 
     # Wait for operation to finish.
@@ -51,7 +51,7 @@ def create_second_partition(a):
 
 def create_third_partition(a):
     """ create partitions """
-    new_parts = [NewPartitions(topic_name, 3, [[2, 0]])]
+    new_parts = [NewPartitions(topic_name, 3, [[2],[1],[3]])]
     fs = a.create_partitions(new_parts, validate_only=False)
 
     # Wait for operation to finish.
@@ -77,7 +77,7 @@ def delete_topic(a, topic):
 
 
 def create_topic(a):
-    new_topics = [NewTopic(topic_name, num_partitions=1, replication_factor=-1, replica_assignment=[[0, 1]])]
+    new_topics = [NewTopic(topic_name, num_partitions=1, replication_factor=-1, replica_assignment=[[2]])]
     # Note: In a multi-cluster production scenario, it is more typical to use a replication_factor of 3 for durability.
     # Call create_topics to asynchronously create topics. A dict
     # of <topic,future> is returned.
