@@ -155,4 +155,8 @@ kafkacat -b pkc-ymrq7.us-east-2.aws.confluent.cloud:9092 \
 ```
 
 
+########## Links
+
+Confluent Python Library: https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#pyclient-admin-newpartitions
+
 
