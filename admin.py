@@ -48,7 +48,7 @@ def create_second_partition(a):
         except Exception as e:
             logMessage("Failed to add partitions to topic {}: {}".format(topic, e))
 
-            
+
 def create_third_partition(a):
     """ create partitions """
     new_parts = [NewPartitions(topic_name, 3, [[2, 0]])]
@@ -106,5 +106,3 @@ while True:
         time.sleep(3)
         create_topic(a)
     time.sleep(3)
-
-
