@@ -159,4 +159,10 @@ kafkacat -b pkc-ymrq7.us-east-2.aws.confluent.cloud:9092 \
 
 Confluent Python Library: https://docs.confluent.io/platform/current/clients/confluent-kafka-python/html/index.html#pyclient-admin-newpartitions
 
+### My Setup
+
+3 Broker Cluster:
+Broker 0: IP: 192.168.8.10 Running Kafka, Zookeeper, topic_checker.py, consumer.py Physical Location: Bottom.
+Broker 1: IP: 192.168.8.20 Running Kafka, topic_checker.py, consumer.py Physical Location: Middle.
+Broker 2: IP: 192.168.8.30 Running Kafka, admin.py, topic_checker.py, consumer.py Physical Location: Top.
 
