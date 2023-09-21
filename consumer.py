@@ -20,7 +20,8 @@ red = (255,0,0)
 blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
-specialMessage = (2,8,6)
+noMessage = (2,8,7)
+delayMessage = (2,8,6)
 
 sleep_time_seconds = .5
 current_index=0
@@ -43,8 +44,12 @@ def processMessage(message):
         logMessage("Message being rejected to high or low")
         return None
       # if special message of 2,8,6 then change sleep time
-      if(tupleMessage == specialMessage):
-        sleep_time_seconds = .5 if sleep_time_seconds==0 else 0
+      if(tupleMessage == delayMessage):
+        sleep_time_seconds = .5
+        logMessage("Sleeptime=" + str(sleep_time_seconds))
+        return None
+      elif(tupleMessage == noMessage):
+        sleep_time_seconds = 0
         logMessage("Sleeptime=" + str(sleep_time_seconds))
         return None
     return tupleMessage
@@ -126,3 +131,4 @@ except KeyboardInterrupt:
 
 finally:
     c.close()
+
