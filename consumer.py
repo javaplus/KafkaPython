@@ -20,7 +20,9 @@ red = (255,0,0)
 blue = (0,0,255)
 green = (0,255,0)
 yellow  = (255,255,0)
+specialMessage = (2,8,6)
 
+sleep_time_seconds = .5
 current_index=0
 
 def clear_bar():
@@ -28,16 +30,22 @@ def clear_bar():
         pixels[x] = (0, 0, 0)
     current_index=0
 
-pixels = neopixel.NeoPixel(board.D18, num_of_leds + num_of_plaque_leds,brightness=0.03)
+pixels = neopixel.NeoPixel(board.D18, num_of_leds + num_of_plaque_leds,brightness=0.10)
 clear_bar()
 
 def processMessage(message):
+  global sleep_time_seconds
   try:
     tupleMessage =  tuple(map(int,msgvalue.split(",")))
 
     for i in range(3):
       if(tupleMessage[i] < 0 or tupleMessage[i] > 255):
         logMessage("Message being rejected to high or low")
+        return None
+      # if special message of 2,8,6 then change sleep time
+      if(tupleMessage == specialMessage):
+        sleep_time_seconds = .5 if sleep_time_seconds==0 else 0
+        logMessage("Sleeptime=" + str(sleep_time_seconds))
         return None
     return tupleMessage
   except Exception as e:
@@ -63,7 +71,7 @@ def checkButton():
         return False
 
 def lightNamePlaque():
-    pixels.brightness =.8
+    pixels.brightness =.1
     totalLeds = num_of_leds + num_of_plaque_leds
     for pixel in range(num_of_leds, totalLeds):
         pixels[pixel] = (255,255,255)
@@ -96,6 +104,8 @@ try:
                     processedMessage = processMessage(msgvalue)
                     if processedMessage is None:
                       continue
+                    # after consuming message, pause before displaying
+                    time.sleep(sleep_time_seconds)
                     pixels[current_index] = processedMessage
                     current_index = current_index + 1
                     logMessage("Doned!!!!!")
@@ -116,5 +126,3 @@ except KeyboardInterrupt:
 
 finally:
     c.close()
-
-
