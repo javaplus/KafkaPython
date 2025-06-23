@@ -161,8 +161,9 @@ Confluent Python Library: https://docs.confluent.io/platform/current/clients/con
 
 ### My Setup
 
-3 Broker Cluster:
-Broker 0: IP: 192.168.8.10 Running Kafka, Zookeeper, topic_checker.py, consumer.py Physical Location: Bottom.
-Broker 1: IP: 192.168.8.20 Running Kafka, topic_checker.py, consumer.py Physical Location: Middle.
-Broker 2: IP: 192.168.8.30 Running Kafka, admin.py, topic_checker.py, consumer.py Physical Location: Top.
+3 Broker Cluster:  
+Broker 0: IP: 192.168.8.10 Running Kafka, Zookeeper, topic_checker.py, consumer.py Physical Location: Bottom.  
+Broker 1: IP: 192.168.8.20 Running Kafka, topic_checker.py, consumer.py Physical Location: Middle.   
+Broker 2: IP: 192.168.8.30 Running Kafka, admin.py, topic_checker.py, consumer.py Physical Location: Top.  
 
+Network "apachekafka"
